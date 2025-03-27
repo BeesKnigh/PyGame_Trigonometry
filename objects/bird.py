@@ -22,7 +22,7 @@ class Bird:
         self.dragging = False
 
     def launch(self, mouse_pos):
-        """Запускает птицу, рассчитывая угол и силу выстрела."""
+        # Расчет направления и силы запуска на основе позиции мыши
         dx = self.start_pos[0] - mouse_pos[0]
         dy = self.start_pos[1] - mouse_pos[1]
         angle = math.atan2(dy, dx)
@@ -32,7 +32,6 @@ class Bird:
         self.launched = True
 
     def update(self, dt):
-        """Обновляет положение птицы с учетом физики."""
         if self.launched:
             self.pos[0] += self.vx * dt
             self.pos[1] += self.vy * dt
@@ -47,5 +46,7 @@ class Bird:
                 if abs(self.vx) < 10:
                     self.vx = 0
 
-    def draw(self, screen):
-        pygame.draw.circle(screen, self.color, (int(self.pos[0]), int(self.pos[1])), self.radius)
+    def draw(self, screen, offset=(0, 0)):
+        # Отрисовка с учетом смещения камеры
+        pos_on_screen = (int(self.pos[0] - offset[0]), int(self.pos[1] - offset[1]))
+        pygame.draw.circle(screen, self.color, pos_on_screen, self.radius)

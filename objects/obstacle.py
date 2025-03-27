@@ -9,5 +9,7 @@ class Obstacle:
     def is_destroyed(self):
         return self.health <= 0
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+    def draw(self, screen, offset=(0, 0)):
+        # Применяем смещение к прямоугольнику препятствия
+        rect_with_offset = self.rect.move(-offset[0], -offset[1])
+        pygame.draw.rect(screen, self.color, rect_with_offset)
