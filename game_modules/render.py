@@ -82,7 +82,7 @@ def draw_game(game_state):
             dy = start_pos[1] - mouse_pos[1]
             angle = math.atan2(dy, dx)
             angle_text = game_state.font.render(f"Угол: {math.degrees(angle):.1f}°", True, (0, 0, 255))
-            game_state.screen.blit(angle_text, (20, 20))
+            game_state.screen.blit(angle_text, (70, 20))
 
     # Отображение оставшихся птиц
     remaining_birds = max(0, len(game_state.birds) - game_state.current_bird_index)
