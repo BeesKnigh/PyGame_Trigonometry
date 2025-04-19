@@ -12,7 +12,7 @@ from game_modules.camera import Camera
 
 class GameState:
     def __init__(self):
-        pygame.display.set_caption("Angry Birds: Модульная версия")
+        pygame.display.set_caption("Angry Eva: Модульная версия")
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont(None, 36)
