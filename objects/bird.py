@@ -99,11 +99,5 @@ class Bird:
                 screen.blit(rotated_img, img_rect)
             else:
                 screen.blit(self.image, img_rect)
-        else:
-            # Если изображения нет, рисуем круг
-            pygame.draw.circle(screen, self.color, pos_on_screen, self.radius)
 
-        # Дополнительно рисуем птицу как круг с учетом смещения камеры (если изображения нет)
-        pos_on_screen = (int(self.pos[0] - offset[0]), int(self.pos[1] - offset[1]))
-        pygame.draw.circle(screen, self.color, pos_on_screen, self.radius)
 

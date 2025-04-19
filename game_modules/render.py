@@ -86,8 +86,8 @@ def draw_game(game_state):
 
     # Отображение оставшихся птиц
     remaining_birds = max(0, len(game_state.birds) - game_state.current_bird_index)
-    birds_text = game_state.font.render(f"Осталось птиц: {remaining_birds}", True, (0, 0, 255))
-    game_state.screen.blit(birds_text, (20, 60))
+    birds_text = game_state.font.render(f"Осталось кошек: {remaining_birds}", True, (0, 0, 255))
+    game_state.screen.blit(birds_text, (70, 60))
 
     # Победа / Поражение
     if all(not pig.alive for pig in game_state.pigs):
