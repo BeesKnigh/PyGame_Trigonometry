@@ -22,7 +22,7 @@ class Obstacle:
         return (
             random.randint(120, 160),  # R
             random.randint(50, 80),    # G
-            random.randint(10, 30)      # B
+            random.randint(10, 30)     # B
         )
     
     def _create_texture(self):
@@ -43,9 +43,9 @@ class Obstacle:
                 
                 for row in range(8):
                     for col in range(5):
-                        offset = brick_width//2 if row % 2 else 0
-                        pos_x = col*brick_width + offset
-                        pos_y = row*brick_height
+                        offset = brick_width // 2 if row % 2 else 0
+                        pos_x = col * brick_width + offset
+                        pos_y = row * brick_height
                         
                         if (pos_x < self.rect.width and pos_y < self.rect.height and
                             brick_width > 2 and brick_height > 2):
@@ -68,9 +68,11 @@ class Obstacle:
             return texture
 
     def is_destroyed(self):
+        """Проверяет, разрушено ли препятствие"""
         return self.health <= 0
 
     def draw(self, screen, offset=(0, 0)):
+        """Отрисовка препятствия на экране с учетом смещения"""
         pos = (self.rect.x - offset[0], self.rect.y - offset[1])
         screen.blit(self.texture, pos)
         pygame.draw.rect(screen, (0, 0, 0), (*pos, self.rect.width, self.rect.height), 2)

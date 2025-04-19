@@ -3,7 +3,7 @@ import os
 from settings import GRAVITY, GROUND_Y, RESTITUTION
 
 class Pig:
-    def __init__(self, pos, radius, color, image_path="../cucumber.png", size_multiplier=5.0):  # Увеличил size_multiplier до 5.0
+    def __init__(self, pos, radius, color, image_path="../cucumber.png", size_multiplier=5.0):
         self.pos = list(pos)
         self.radius = radius
         self.alive = True
@@ -14,9 +14,6 @@ class Pig:
         # Получаем абсолютный путь к изображению
         full_path = os.path.join(os.path.dirname(__file__), image_path)
         
-        print(f"Пытаемся загрузить изображение по пути: {full_path}")
-        print(f"Файл существует: {os.path.exists(full_path)}")
-        
         try:
             # Загружаем изображение
             original_image = pygame.image.load(full_path).convert_alpha()
@@ -25,8 +22,6 @@ class Pig:
             new_width = int(2 * self.radius * self.size_multiplier)
             new_height = int(2 * self.radius * self.size_multiplier)
             self.image = pygame.transform.smoothscale(original_image, (new_width, new_height))
-            
-            print(f"Изображение успешно загружено и масштабировано до {new_width}x{new_height}")
         except Exception as e:
             print(f"Ошибка загрузки изображения: {e}")
             self.image = None
@@ -44,14 +39,13 @@ class Pig:
             self.vy = -self.vy * RESTITUTION
 
     def draw(self, screen, offset=(0, 0)):
-        if not self.alive:
-            return
+        if self.alive:
+            pos_on_screen = (int(self.pos[0] - offset[0]), int(self.pos[1] - offset[1]))
 
-        pos_on_screen = (int(self.pos[0] - offset[0]), int(self.pos[1] - offset[1]))
-
-        if self.image:
-            # Центрируем увеличенное изображение
-            img_rect = self.image.get_rect(center=pos_on_screen)
-            screen.blit(self.image, img_rect)
-        else:
-            pygame.draw.circle(screen, self.color, pos_on_screen, self.radius)
+            if self.image:
+                # Центрируем увеличенное изображение
+                img_rect = self.image.get_rect(center=pos_on_screen)
+                screen.blit(self.image, img_rect)
+            else:
+                # Если изображение не загружено, рисуем круг
+                pygame.draw.circle(screen, self.color, pos_on_screen, self.radius)

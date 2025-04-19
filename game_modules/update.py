@@ -6,6 +6,7 @@ from settings import (
     GRAVITY,
     GROUND_Y
 )
+from settings import BREAK_THRESHOLD, RESTITUTION, OBSTACLE_SLOWDOWN_FACTOR
 from utils import circle_collision, circle_rect_collision
 
 def update_game(game_state, dt):
