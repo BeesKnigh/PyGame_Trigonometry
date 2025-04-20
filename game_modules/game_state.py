@@ -2,13 +2,12 @@ import pygame
 import os
 import math
 from settings import (
-    WIDTH, HEIGHT, BIRD_RADIUS, START_POS, RED, BROWN, GREEN, GROUND_Y
+    WIDTH, HEIGHT, BIRD_RADIUS, START_POS, RED, BROWN, GREEN, GROUND_Y, IMAGE_PATHS
 )
 from objects.bird import Bird
 from objects.pig import Pig
 from objects.obstacle import Obstacle
 from game_modules.camera import Camera
-
 
 class GameState:
     def __init__(self):
@@ -19,8 +18,8 @@ class GameState:
         self.camera = Camera(follow_margin=200)
 
         # Загрузка изображений
-        self.sky_image = self._load_image("sky.png", (WIDTH, HEIGHT))
-        self.ground_texture = self._load_image("ground.png")
+        self.sky_image = self._load_image(IMAGE_PATHS["sky"], (WIDTH, HEIGHT))
+        self.ground_texture = self._load_image(IMAGE_PATHS["ground"])
         self.ground_height = HEIGHT - GROUND_Y
 
         # Птицы
@@ -38,36 +37,39 @@ class GameState:
         self.game_over = False
         self.running = True
 
-    def _load_image(self, filename, size=None):
-        """Универсальный метод загрузки изображений"""
+    def _load_image(self, path, size=None):
         try:
-            paths_to_try = [
-                filename,
-                f"../{filename}",
-                os.path.join(os.path.dirname(__file__), "..", filename)
+            possible_paths = [
+                path,
+                os.path.join(os.path.dirname(__file__), path),
+                os.path.join(os.path.dirname(__file__), "..", path)
             ]
 
-            for path in paths_to_try:
+            for img_path in possible_paths:
                 try:
-                    image = pygame.image.load(path).convert()
-                    print(f"Успешно загружено: {path}")
+                    image = pygame.image.load(img_path).convert_alpha()
                     if size:
                         return pygame.transform.scale(image, size)
                     return image
-                except pygame.error as e:
-                    print(f"Ошибка загрузки {path}: {e}")
+                except pygame.error:
+                    continue
 
-            print(f"Не удалось загрузить {filename}")
-            return None
+            print(f"Не удалось загрузить изображение: {path}")
+            surf = pygame.Surface((50, 50), pygame.SRCALPHA)
+            pygame.draw.rect(surf, (255, 0, 255, 128), (0, 0, 50, 50))
+            return surf
         except Exception as e:
-            print(f"Критическая ошибка загрузки {filename}: {e}")
+            print(f"Ошибка загрузки изображения: {e}")
             return None
 
     def _create_towers_with_cucumbers(self):
         towers = [
-            {"x": 700, "width": 120, "height": 200, "health": 200, "color": (139, 69, 19), "cucumber": {"size": 3.0}},
-            {"x": 1150, "width": 80, "height": 450, "health": 180, "color": (160, 82, 45), "cucumber": {"size": 3.0}},
-            {"x": 1450, "width": 100, "height": 380, "health": 220, "color": (139, 69, 19), "cucumber": {"size": 3.0}}
+            {"x": 700, "width": 120, "height": 200, "health": 200, 
+             "color": (139, 69, 19), "cucumber": {"size": 3.0}},
+            {"x": 1150, "width": 80, "height": 450, "health": 180, 
+             "color": (160, 82, 45), "cucumber": {"size": 3.0}},
+            {"x": 1450, "width": 100, "height": 380, "health": 220, 
+             "color": (139, 69, 19), "cucumber": {"size": 3.0}}
         ]
 
         obstacles = []
@@ -86,8 +88,7 @@ class GameState:
 
             base_radius = 15
             size_multiplier = tower["cucumber"]["size"]
-            scaled_radius = base_radius * size_multiplier
-
+            
             if i == 0:
                 center_x = tower["x"] + tower["width"] + cucumber_offset + 100
             elif i == 2:
@@ -95,7 +96,7 @@ class GameState:
             else:
                 center_x = tower["x"] + tower["width"] + cucumber_offset + 40
 
-            center_y = GROUND_Y - scaled_radius
+            center_y = GROUND_Y - (base_radius * size_multiplier)
 
             pig = Pig(
                 pos=[center_x, center_y],
@@ -213,7 +214,7 @@ class GameState:
 
         pygame.quit()
 
-
 if __name__ == "__main__":
+    pygame.init()
     game_state = GameState()
     game_state.run()

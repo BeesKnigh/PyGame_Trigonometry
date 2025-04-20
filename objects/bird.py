@@ -1,11 +1,10 @@
 import math
 import pygame
 import os
-from settings import GRAVITY, GROUND_Y, RESTITUTION, LAUNCH_FACTOR
+from settings import GRAVITY, GROUND_Y, RESTITUTION, LAUNCH_FACTOR, IMAGE_PATHS
 
 class Bird:
-    def __init__(self, start_pos, radius, color, image_path="../eva.png", fly_image_path="../eva_fly.png", size_multiplier=5.0):
-        # Инициализация параметров птицы
+    def __init__(self, start_pos, radius, color, image_path=None, fly_image_path=None, size_multiplier=5.0):
         self.start_pos = start_pos
         self.pos = list(start_pos)
         self.radius = radius
@@ -17,7 +16,7 @@ class Bird:
         self.vy = 0
         self.size_multiplier = size_multiplier
 
-        # Загрузка изображений для состояния покоя и полета
+        # Загрузка изображений
         base_size = int(2 * self.radius)
         new_width = int(base_size * self.size_multiplier)
         new_height = int(base_size * self.size_multiplier)
@@ -26,37 +25,54 @@ class Bird:
         self.image_flying = None
         self.image = None
         
+        # Если пути не переданы, используем стандартные
+        image_path = image_path or IMAGE_PATHS["bird"]
+        fly_image_path = fly_image_path or IMAGE_PATHS["bird_fly"]
+
         try:
-            # Формируем пути к изображениям
-            full_path_idle = os.path.join(os.path.dirname(__file__), image_path)
-            full_path_fly = os.path.join(os.path.dirname(__file__), fly_image_path)
-
-            # Загружаем изображения
-            original_image = pygame.image.load(full_path_idle).convert_alpha()
-            fly_image = pygame.image.load(full_path_fly).convert_alpha()
-
-            # Масштабируем изображения
-            self.image_idle = pygame.transform.smoothscale(original_image, (new_width, new_height))
-            self.image_flying = pygame.transform.smoothscale(fly_image, (new_width, new_height))
+            self.image_idle = self._load_image(image_path, new_width, new_height)
+            self.image_flying = self._load_image(fly_image_path, new_width, new_height)
             self.image = self.image_idle
-
-            print(f"Изображения загружены: {full_path_idle} и {full_path_fly}")
         except Exception as e:
             print(f"Ошибка загрузки изображения: {e}")
-            self.image_idle = None
-            self.image_flying = None
-            self.image = None
+            self._create_fallback_surface(new_width, new_height)
+
+    def _load_image(self, path, width, height):
+        """Загружает и масштабирует изображение"""
+        try:
+            possible_paths = [
+                path,
+                os.path.join(os.path.dirname(__file__), path),
+                os.path.join(os.path.dirname(__file__), "..", path)
+            ]
+            
+            for p in possible_paths:
+                try:
+                    img = pygame.image.load(p).convert_alpha()
+                    return pygame.transform.smoothscale(img, (width, height))
+                except pygame.error:
+                    continue
+            raise FileNotFoundError(f"Не удалось загрузить изображение: {path}")
+        except Exception as e:
+            raise e
+
+    def _create_fallback_surface(self, width, height):
+        """Создает поверхность-заглушку если изображения не загрузились"""
+        surf = pygame.Surface((width, height), pygame.SRCALPHA)
+        pygame.draw.circle(surf, (*self.color, 128), (width//2, height//2), width//2)
+        self.image_idle = surf
+        self.image_flying = surf
+        self.image = surf
 
     def reset(self):
-        """Сброс состояния птицы для повторного запуска."""
         self.pos = list(self.start_pos)
         self.vx = 0
         self.vy = 0
         self.launched = False
         self.dragging = False
+        self.image = self.image_idle
 
     def launch(self, mouse_pos):
-        """Запуск птицы в направлении мыши."""
         dx = self.start_pos[0] - mouse_pos[0]
         dy = self.start_pos[1] - mouse_pos[1]
         angle = math.atan2(dy, dx)
@@ -64,30 +80,26 @@ class Bird:
         self.vx = power * math.cos(angle)
         self.vy = power * math.sin(angle)
         self.launched = True
+        self.image = self.image_flying
 
     def update(self, dt):
-        """Обновление позиции птицы с учетом физики."""
         if self.launched:
             self.pos[0] += self.vx * dt
             self.pos[1] += self.vy * dt
-            self.vy += GRAVITY * dt  # Применение силы тяжести
+            self.vy += GRAVITY * dt
 
-            # Столкновение с землей
             if self.pos[1] >= GROUND_Y - self.radius:
                 self.pos[1] = GROUND_Y - self.radius
                 self.vy = -self.vy * RESTITUTION
-                self.vx *= 0.9  # Потери на трение
+                self.vx *= 0.9
                 if abs(self.vy) < 10:
                     self.vy = 0
                 if abs(self.vx) < 10:
                     self.vx = 0
+                    self.image = self.image_idle
 
     def draw(self, screen, offset=(0, 0)):
-        """Отрисовка птицы на экране с учетом смещения камеры."""
         pos_on_screen = (int(self.pos[0] - offset[0]), int(self.pos[1] - offset[1]))
-
-        # Выбираем изображение в зависимости от состояния (полет или покой)
-        self.image = self.image_flying if self.launched else self.image_idle
 
         if self.image:
             img_rect = self.image.get_rect(center=pos_on_screen)
@@ -99,5 +111,3 @@ class Bird:
                 screen.blit(rotated_img, img_rect)
             else:
                 screen.blit(self.image, img_rect)
-
-
