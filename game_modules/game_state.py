@@ -17,12 +17,10 @@ class GameState:
         self.font = pygame.font.SysFont(None, 36)
         self.camera = Camera(follow_margin=200)
 
-        # Загрузка изображений
         self.sky_image = self._load_image(IMAGE_PATHS["sky"], (WIDTH, HEIGHT))
         self.ground_texture = self._load_image(IMAGE_PATHS["ground"])
         self.ground_height = HEIGHT - GROUND_Y
 
-        # Птицы
         self.birds = [
             Bird(START_POS, BIRD_RADIUS, RED),
             Bird(START_POS, BIRD_RADIUS, (255, 100, 0)),
@@ -31,7 +29,6 @@ class GameState:
         self.current_bird_index = 0
         self.current_bird = self.birds[self.current_bird_index]
 
-        # Препятствия и свиньи
         self.obstacles, self.pigs = self._create_towers_with_cucumbers()
 
         self.game_over = False

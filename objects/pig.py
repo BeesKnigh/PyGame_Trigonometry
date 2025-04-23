@@ -11,11 +11,9 @@ class Pig:
         self.vy = 0
         self.size_multiplier = size_multiplier
         
-        # Устанавливаем стандартный путь если не указан
         if image_path is None:
             image_path = os.path.join("design_assets", "game_assets", "items", "cucumber.png")
         
-        # Пробуем несколько вариантов путей для загрузки
         possible_paths = [
             image_path,
             os.path.join(os.path.dirname(__file__), image_path),
@@ -26,7 +24,6 @@ class Pig:
         
         for path in possible_paths:
             try:
-                # Загружаем и масштабируем изображение
                 original_image = pygame.image.load(path).convert_alpha()
                 new_size = int(2 * self.radius * self.size_multiplier)
                 self.image = pygame.transform.smoothscale(
@@ -43,12 +40,10 @@ class Pig:
             print("Не удалось загрузить изображение, будет использован простой круг")
 
     def reset(self):
-        """Сброс состояния свиньи"""
         self.alive = True
         self.vy = 0
 
     def update(self, dt):
-        """Обновление физики свиньи"""
         if not self.alive:
             return
             
@@ -59,12 +54,10 @@ class Pig:
             self.pos[1] = GROUND_Y - self.radius
             self.vy = -self.vy * RESTITUTION
             
-            # Если скорость очень мала, останавливаем
             if abs(self.vy) < 1:
                 self.vy = 0
 
     def draw(self, screen, offset=(0, 0)):
-        """Отрисовка свиньи с учетом смещения камеры"""
         if not self.alive:
             return
             
@@ -74,11 +67,9 @@ class Pig:
         )
 
         if self.image:
-            # Рисуем изображение с центром в позиции свиньи
             img_rect = self.image.get_rect(center=pos_on_screen)
             screen.blit(self.image, img_rect)
         else:
-            # Запасной вариант - простой круг
             pygame.draw.circle(
                 screen, 
                 self.color, 
@@ -86,7 +77,6 @@ class Pig:
                 int(self.radius * self.size_multiplier)
             )
             
-            # Глаза для лучшей видимости
             eye_pos1 = (
                 pos_on_screen[0] - int(self.radius * 0.3 * self.size_multiplier),
                 pos_on_screen[1] - int(self.radius * 0.2 * self.size_multiplier)

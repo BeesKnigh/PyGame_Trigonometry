@@ -3,11 +3,11 @@ WIDTH = 1600
 HEIGHT = 900
 
 # Параметры земли
-GROUND_Y = 800  # уровень земли (на 50px выше, чем было 850)
+GROUND_Y = 800
 
 # Параметры птицы
 BIRD_RADIUS = 10
-START_POS = (200, 750)  # позиция рогатки (на 50px выше)
+START_POS = (200, 750)  # позиция рогатки
 
 # Физика
 OBSTACLE_SLOWDOWN_FACTOR = 0.8
@@ -30,7 +30,6 @@ PIG_COLOR = (0, 180, 0) # свиньи
 BLUE = (0, 0, 255)      # текст
 BROWN = (139, 69, 19)   # препятствия
 
-# Пути к изображениям
 IMAGE_PATHS = {
     "bird": "design_assets/game_assets/characters/eva.png",
     "bird_fly": "design_assets/game_assets/characters/eva_fly.png",

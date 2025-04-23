@@ -16,7 +16,6 @@ class Bird:
         self.vy = 0
         self.size_multiplier = size_multiplier
 
-        # Загрузка изображений
         base_size = int(2 * self.radius)
         new_width = int(base_size * self.size_multiplier)
         new_height = int(base_size * self.size_multiplier)
@@ -25,7 +24,6 @@ class Bird:
         self.image_flying = None
         self.image = None
         
-        # Если пути не переданы, используем стандартные
         image_path = image_path or IMAGE_PATHS["bird"]
         fly_image_path = fly_image_path or IMAGE_PATHS["bird_fly"]
 
@@ -38,7 +36,6 @@ class Bird:
             self._create_fallback_surface(new_width, new_height)
 
     def _load_image(self, path, width, height):
-        """Загружает и масштабирует изображение"""
         try:
             possible_paths = [
                 path,
@@ -57,7 +54,6 @@ class Bird:
             raise e
 
     def _create_fallback_surface(self, width, height):
-        """Создает поверхность-заглушку если изображения не загрузились"""
         surf = pygame.Surface((width, height), pygame.SRCALPHA)
         pygame.draw.circle(surf, (*self.color, 128), (width//2, height//2), width//2)
         self.image_idle = surf

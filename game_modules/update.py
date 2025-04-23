@@ -2,7 +2,7 @@ import math
 from settings import (
     BREAK_THRESHOLD, 
     RESTITUTION, 
-    OBSTACLE_SLOWDOWN_FACTOR,  # Теперь этот параметр существует
+    OBSTACLE_SLOWDOWN_FACTOR,
     GRAVITY,
     GROUND_Y
 )
@@ -10,16 +10,11 @@ from settings import BREAK_THRESHOLD, RESTITUTION, OBSTACLE_SLOWDOWN_FACTOR
 from utils import circle_collision, circle_rect_collision
 
 def update_game(game_state, dt):
-    """Обновляет логику игры (позиции объектов, столкновения и т.д.)."""
-
-    # Обновляем состояние свиней
     for pig in game_state.pigs:
         pig.update(dt)
 
-    # Проверяем, уничтожены ли все свиньи (уровень пройден)
     level_complete = all(not pig.alive for pig in game_state.pigs)
 
-    # Если птица запущена, обновляем её и проверяем столкновения
     if (game_state.current_bird and 
         game_state.current_bird.launched and 
         not level_complete and 
@@ -28,7 +23,6 @@ def update_game(game_state, dt):
         bird = game_state.current_bird
         bird.update(dt)
 
-        # Обработка столкновений с препятствиями
         for obstacle in game_state.obstacles[:]:
             if circle_rect_collision(bird.pos[0], bird.pos[1], bird.radius, obstacle.rect):
                 impact_speed = math.hypot(bird.vx, bird.vy)
@@ -40,11 +34,9 @@ def update_game(game_state, dt):
                     bird.vx = -bird.vx * RESTITUTION
                     bird.vy = -bird.vy * RESTITUTION
 
-                # Применяем замедление к скорости птицы
                 bird.vx *= OBSTACLE_SLOWDOWN_FACTOR
                 bird.vy *= OBSTACLE_SLOWDOWN_FACTOR
 
-        # Обработка столкновений со свиньями
         for pig in game_state.pigs:
             if pig.alive and circle_collision(
                 bird.pos[0], bird.pos[1], bird.radius,
@@ -52,7 +44,6 @@ def update_game(game_state, dt):
             ):
                 pig.alive = False
 
-        # Если птица остановилась, переключаемся на следующую
         if abs(bird.vx) < 5 and abs(bird.vy) < 5:
             game_state.current_bird_index += 1
             if game_state.current_bird_index < len(game_state.birds):

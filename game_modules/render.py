@@ -5,17 +5,14 @@ from settings import WHITE, GREEN, GROUND_Y, HEIGHT, WIDTH
 from objects.obstacle import Obstacle
 
 def draw_game(game_state):
-    """Отрисовывает весь текущий кадр."""
-    # Фон
     if game_state.sky_image:
         game_state.screen.blit(game_state.sky_image, (0, 0))
     else:
         game_state.screen.fill(WHITE)
 
-    # Смещение камеры
     camera_offset = game_state.camera.get_offset(game_state.current_bird) if game_state.current_bird else (0, 0)
 
-    # Загрузка текстуры земли (один раз)
+
     if not hasattr(game_state, 'ground_texture'):
         game_state.ground_texture = None
         try:
@@ -35,7 +32,6 @@ def draw_game(game_state):
         except Exception as e:
             print(f"Ошибка загрузки текстуры земли: {e}")
 
-    # Отрисовка земли
     ground_height = HEIGHT - GROUND_Y
     if game_state.ground_texture:
         texture_width = game_state.ground_texture.get_width()
@@ -52,19 +48,15 @@ def draw_game(game_state):
             (-camera_offset[0], GROUND_Y, 2 * WIDTH, ground_height)
         )
 
-    # Отрисовка препятствий
     for obstacle in game_state.obstacles:
         obstacle.draw(game_state.screen, camera_offset)
 
-    # Отрисовка свиней
     for pig in game_state.pigs:
         pig.draw(game_state.screen, camera_offset)
 
-    # Отрисовка текущей птицы
     if game_state.current_bird:
         game_state.current_bird.draw(game_state.screen, camera_offset)
 
-        # Отрисовка линии прицеливания
         if game_state.current_bird.dragging:
             mouse_pos = pygame.mouse.get_pos()
             start_pos = game_state.current_bird.start_pos
@@ -77,19 +69,16 @@ def draw_game(game_state):
                 3
             )
 
-            # Расчет угла
             dx = start_pos[0] - (mouse_pos[0] + camera_offset[0])
             dy = start_pos[1] - mouse_pos[1]
             angle = math.atan2(dy, dx)
             angle_text = game_state.font.render(f"Угол: {math.degrees(angle):.1f}°", True, (0, 0, 255))
             game_state.screen.blit(angle_text, (70, 20))
 
-    # Отображение оставшихся птиц
     remaining_birds = max(0, len(game_state.birds) - game_state.current_bird_index)
     birds_text = game_state.font.render(f"Осталось кошек: {remaining_birds}", True, (0, 0, 255))
     game_state.screen.blit(birds_text, (70, 60))
 
-    # Победа / Поражение
     if all(not pig.alive for pig in game_state.pigs):
         victory_text = game_state.font.render("Уровень пройден! Нажмите R для рестарта.", True, (0, 0, 255))
         game_state.screen.blit(
